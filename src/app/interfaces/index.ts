@@ -22,9 +22,3 @@ export interface Source {
     name: string;
 }
 
-export interface ArticlesByCategoryAndPage {
-    [key: string]: {
-        page: number,
-        articles: Article[]
-    }
-}
