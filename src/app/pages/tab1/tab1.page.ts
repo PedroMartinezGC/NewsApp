@@ -3,6 +3,7 @@ import { NewsService } from '../../services/news.service';
 import { Article } from '../../interfaces/index';
 import { IonInfiniteScroll } from '@ionic/angular';
 import { NewsResponse } from '../../interfaces/index';
+import { PopoverService } from 'src/app/services/popover.service';
 
 @Component({
   selector: 'app-tab1',
@@ -12,27 +13,31 @@ import { NewsResponse } from '../../interfaces/index';
 })
 export class Tab1Page implements OnInit{
 
-  articles: Article[] = [];
-  page: number = 1;
+  public articles         : Article[] = [];
+  public page             : number = 1;
+
+  public selectedCountry  : any = {
+    id: 'us',
+    path: 'assets/icon-flags/us.svg'
+  }
 
   @ViewChild(IonInfiniteScroll) ionInfiniteScroll: IonInfiniteScroll; 
 
-  constructor(private _newsService: NewsService) {
+  constructor ( private newsSrv     : NewsService,
+                private popoverSrv  : PopoverService
+              ) {
 
   }
   ngOnInit(){
-    this._newsService.getTopHeadlines(this.page).subscribe((response: NewsResponse)=>{
-
+   this.newsSrv.getTopHeadlines(this.page).subscribe((response: NewsResponse)=>{
       this.articles.push(...response.articles);    //... is spread operator, it iterates each element and concatenate its
-
-      console.log(this.articles);
     });
   }
 
   loadData(){
-    this.page = this.page + 1;      //we load another page
+    this.page = this.page + 1;      // we load another page
 
-    this._newsService.getTopHeadlines(this.page).subscribe((response: NewsResponse)=>{
+    this.newsSrv.getTopHeadlines(this.page).subscribe((response: NewsResponse)=>{
       
       if(this.articles.length == response.totalResults){    //when there are no more pages to load, the infinite scroll is disabled
         
@@ -41,16 +46,27 @@ export class Tab1Page implements OnInit{
       }
 
       this.articles.push(...response.articles);           //if there are more pages, the array concatenate the nesxt page
-
-      console.log('have pushed');
     });
-
-    console.log('load more data');
 
     setTimeout(()=>{
       this.ionInfiniteScroll.complete();
-    }, 3000);
+    }, 3000); 
   }
+
+  async selectCountry(event: any){
+
+    this.selectedCountry = await this.popoverSrv.countriesSelection(event);
+
+    if( (this.selectedCountry.path != undefined) || (this.selectedCountry.id != undefined)){
+      
+      this.articles = [];
+      
+      this.newsSrv.getTopHeadlines(1, this.selectedCountry.id).subscribe( (response: NewsResponse)=>{
+        this.articles.push(...response.articles);
+      } );
+    }  
+  }
+
 }
 
 

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NewsService } from '../../services/news.service';
 import { Article, NewsResponse } from '../../interfaces/index';
+import { PopoverService } from '../../services/popover.service';
 
 @Component({
   selector: 'app-tab2',
@@ -20,11 +21,17 @@ export class Tab2Page implements OnInit{
     'technology'
   ];
 
-  selectedCategory: string = this.categories[0];
-  articles: Article[] = [];
-  page: number = 1;
+  public selectedCategory : string = this.categories[0];
+  public articles         : Article[] = [];
+  public page             : number = 1;
 
-  constructor(private _newsService: NewsService) {
+  public selectedCountry  : any = {
+    id: 'us',
+    path: 'assets/icon-flags/us.svg'
+  }
+
+  constructor(private newsSrv: NewsService,
+              private popoverSrv: PopoverService) {
 
   }
 
@@ -33,7 +40,7 @@ export class Tab2Page implements OnInit{
   }
 
   takeHeadlines(){
-    this._newsService.getTopHeadlinesByCategory(this.selectedCategory, this.page).subscribe(response=>{
+    this.newsSrv.getTopHeadlinesByCategory(this.selectedCategory, this.page, this.selectedCountry.id).subscribe(response=>{
 
       this.articles.splice(0, this.articles.length);    //when each category is selected, the articles of the previous are deleted
       this.page = 1;                                    //the initial page is the page 1 each time we change the category
@@ -56,7 +63,7 @@ export class Tab2Page implements OnInit{
 
     this.page = this.page + 1;      //we load another page
 
-    this._newsService.getTopHeadlinesByCategory(this.selectedCategory, this.page).subscribe((response: NewsResponse)=>{
+    this.newsSrv.getTopHeadlinesByCategory(this.selectedCategory, this.page, this.selectedCountry.id).subscribe((response: NewsResponse)=>{
       
       if(this.articles.length == response.totalResults){
         
@@ -64,9 +71,6 @@ export class Tab2Page implements OnInit{
       }
 
       this.articles.push(...response.articles);
-
-      console.log('have pushed');
-      console.log(this.articles);
     });
 
     console.log('load more data');
@@ -74,6 +78,21 @@ export class Tab2Page implements OnInit{
     setTimeout(()=>{
       event.target.complete();
     }, 3000);
+  }
+
+  async selectCountry(event: any){
+
+    this.selectedCountry = await this.popoverSrv.countriesSelection(event);
+
+    if( (this.selectedCountry.path != undefined) || (this.selectedCountry.id != undefined)){
+      
+      this.articles = [];
+      
+      this.newsSrv.getTopHeadlinesByCategory(this.selectedCategory, this.page, this.selectedCountry.id).subscribe((response: NewsResponse)=>{
+        
+        this.articles.push(...response.articles);
+      });
+    }  
   }
 
 }

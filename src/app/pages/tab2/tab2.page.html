@@ -7,10 +7,28 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
   <ion-header collapse="condense" mode="ios" class="ion-no-border">
+
     <ion-toolbar>
-      <ion-title size="large">Headers</ion-title>
+
+      <div>
+        <div style="display:inline-block">
+          <ion-title class="mobile-hidden" size="large">Headers</ion-title>
+        </div>
+      </div>
+        
+      <div class="country-button country-hidden">
+
+        <ion-img style="display:inline-block; margin-bottom: -10px; margin-right: -15px;" [src]="selectedCountry.path" class="flag-icon"></ion-img>
+        <ion-button style="display:inline-block" id="size-button" expand="block" fill="clear" shape="round" slot="end" (click)="selectCountry($event)">
+          {{selectedCountry.id | uppercase}}
+        </ion-button>
+
+      </div>
+
     </ion-toolbar>
+
   </ion-header>
 
   <ion-segment [value]="selectedCategory" (ionChange)="segmentChanged($event)" scrollable mode="md">

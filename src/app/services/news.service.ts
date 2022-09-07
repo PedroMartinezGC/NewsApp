@@ -20,23 +20,23 @@ export class NewsService implements OnInit{
   ngOnInit(): void {
   }
 
-  getTopHeadlines(page: number): Observable<NewsResponse>{
+  getTopHeadlines(page: number, id: string = 'us'): Observable<NewsResponse>{
 
     return this._http.get<NewsResponse>('https://newsapi.org/v2/top-headlines', {
       params: {
         apiKey: apiKey,
-        country: 'us',
+        country: id,
         page: page,
         category: 'business'
     }});
   }
 
-  getTopHeadlinesByCategory(category: string, page: number): Observable<NewsResponse>{
+  getTopHeadlinesByCategory(category: string, page: number, id: string = 'us'): Observable<NewsResponse>{
 
     return this._http.get<NewsResponse>('https://newsapi.org/v2/top-headlines', {
       params: {
         apiKey: apiKey,
-        country: 'us',
+        country: id,
         category: category,
         page: page
     }});

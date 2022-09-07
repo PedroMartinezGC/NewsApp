@@ -8,7 +8,7 @@ import { Article } from '../../interfaces/index';
 })
 export class ArticlesComponent implements OnInit {
 
-  @Input() articles: Article[] = [];
+  @Input() articles: Article;
 
   constructor() { }
 
